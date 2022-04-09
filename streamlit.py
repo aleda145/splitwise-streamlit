@@ -12,6 +12,7 @@ def clean_df():
     df["Date"] = pd.to_datetime(df["Date"])
     return df
 
+
 def check_categories(df):
     cat_df = df[["Date", "Cost", "Category"]]
     cat_list = sorted(list(cat_df["Category"].unique()))
@@ -22,8 +23,15 @@ def check_categories(df):
         # set as the categories for the Category column
         # just pandas stuff
         cat_df["Category"] = cat_df["Category"].cat.remove_unused_categories()
-    if st.checkbox("Coalesce"):
-        top_5 = cat_df.groupby("Category").sum().sort_values(by="Cost", ascending=False)[0:5]
+
+    show_top = st.slider("Coalesce", 0, len(cat_list), value=5)
+
+    if show_top:
+        top_5 = (
+            cat_df.groupby("Category")
+            .sum()
+            .sort_values(by="Cost", ascending=False)[0:show_top]
+        )
         top_5_cat = list(top_5.index)
         cat_df.loc[~cat_df["Category"].isin(top_5_cat), "Category"] = "Other"
 
@@ -62,6 +70,7 @@ def check_categories(df):
     )
     st.altair_chart(chart, use_container_width=True)
 
+
 def check_who(df):
     cat_list = sorted(list(df["Category"].unique()))
     compare_cat = st.selectbox("Which Category to check?", cat_list)
@@ -75,7 +84,9 @@ def check_who(df):
     payer = who_df["Balance"] > 0
     who_df.loc[payer, ["Paid"]] = who_df.loc[payer, ["Cost"]].values
     who_df = who_df.dropna()
-    who_df = who_df.groupby([pd.Grouper(key="Date", freq="M"), "Category", "User"]).sum()
+    who_df = who_df.groupby(
+        [pd.Grouper(key="Date", freq="M"), "Category", "User"]
+    ).sum()
     who_df = who_df.reset_index()
 
     chart = (
@@ -91,7 +102,6 @@ def check_who(df):
         .encode(x="Date:T", y=alt.Y("Cost:Q", stack="normalize"), color="User")
     )
     st.altair_chart(chart, use_container_width=True)
-
 
 
 if __name__ == "__main__":
