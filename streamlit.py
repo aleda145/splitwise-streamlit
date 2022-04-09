@@ -4,7 +4,7 @@ import altair as alt
 
 
 def clean_df():
-    df = pd.read_csv("finance-2022-04-08.csv")
+    df = pd.read_csv("splitwise.csv")
     df = df[:-1]  # Remove last row, summary from splitwise
 
     # Set types
