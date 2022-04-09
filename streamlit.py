@@ -84,20 +84,38 @@ def check_who(df):
     payer = who_df["Balance"] > 0
     who_df.loc[payer, ["Paid"]] = who_df.loc[payer, ["Cost"]].values
     who_df = who_df.dropna()
-    who_df = who_df.groupby(
+    who_sum_df = who_df.groupby(
         [pd.Grouper(key="Date", freq="M"), "Category", "User"]
     ).sum()
-    who_df = who_df.reset_index()
+    who_sum_df = who_sum_df.reset_index()
 
     chart = (
-        alt.Chart(who_df)
+        alt.Chart(who_sum_df)
         .mark_area(opacity=0.5)
         .encode(x="Date:T", y=alt.Y("Cost:Q"), color="User")
     )
     st.altair_chart(chart, use_container_width=True)
 
     chart = (
-        alt.Chart(who_df)
+        alt.Chart(who_sum_df)
+        .mark_area(opacity=0.5)
+        .encode(x="Date:T", y=alt.Y("Cost:Q", stack="normalize"), color="User")
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+    who_count_df = who_df.groupby(
+        [pd.Grouper(key="Date", freq="M"), "Category", "User"]
+    ).count()
+    who_count_df = who_count_df.reset_index()
+    chart = (
+        alt.Chart(who_count_df)
+        .mark_area(opacity=0.5)
+        .encode(x="Date:T", y=alt.Y("Cost:Q"), color="User")
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+    chart = (
+        alt.Chart(who_count_df)
         .mark_area(opacity=0.5)
         .encode(x="Date:T", y=alt.Y("Cost:Q", stack="normalize"), color="User")
     )
