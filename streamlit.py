@@ -9,12 +9,11 @@ def clean_df():
 
     # Set types
     df["Cost"] = df["Cost"].astype(float)
-    df["Category"] = df["Category"].astype("category")
     df["Date"] = pd.to_datetime(df["Date"])
     return df
 
 def check_categories(df):
-    cat_df = df
+    cat_df = df[["Date", "Cost", "Category"]]
     cat_list = sorted(list(cat_df["Category"].unique()))
     categories = st.multiselect("Choose Categories", cat_list, [])
     if categories:
@@ -23,6 +22,10 @@ def check_categories(df):
         # set as the categories for the Category column
         # just pandas stuff
         cat_df["Category"] = cat_df["Category"].cat.remove_unused_categories()
+    if st.checkbox("Coalesce"):
+        top_5 = cat_df.groupby("Category").sum().sort_values(by="Cost", ascending=False)[0:5]
+        top_5_cat = list(top_5.index)
+        cat_df.loc[~cat_df["Category"].isin(top_5_cat), "Category"] = "Other"
 
     chart = (
         alt.Chart(cat_df)
@@ -97,4 +100,6 @@ if __name__ == "__main__":
     if st.checkbox("Exlude payments", value=True):
         df = df[df["Category"] != "Payment"]
     check_categories(df)
+    df["Category"] = df["Category"].astype("category")
+
     check_who(df)
