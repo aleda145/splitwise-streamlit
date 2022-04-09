@@ -47,6 +47,7 @@ def check_categories(df):
         .encode(
             alt.X("sum(Cost)", axis=alt.Axis(title="Spend")),
             alt.Y("Category", sort="-x"),
+            tooltip="sum(Cost):Q",
         )
     )
     st.altair_chart(chart, use_container_width=True)
@@ -57,6 +58,7 @@ def check_categories(df):
         .encode(
             theta=alt.Theta("sum(Cost)", type="quantitative"),
             color=alt.Color(field="Category", type="nominal"),
+            tooltip="sum(Cost):Q",
         )
     )
     st.altair_chart(chart_pie, use_container_width=True)
@@ -66,13 +68,26 @@ def check_categories(df):
     chart = (
         alt.Chart(date_df)
         .mark_area(opacity=0.5)
-        .encode(x="Date:T", y=alt.Y("Cost:Q",axis=alt.Axis(title="Spend")), color="Category")
+        .encode(
+            x="Date:T",
+            y=alt.Y("Cost:Q", axis=alt.Axis(title="Spend")),
+            color="Category",
+            tooltip="Cost:Q",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
     chart = (
         alt.Chart(date_df)
         .mark_area(opacity=0.5)
-        .encode(x="Date:T", y=alt.Y("Cost:Q",axis=alt.Axis(format="%", title="Percentage"), stack="normalize"), color="Category")
+        .encode(
+            x="Date:T",
+            y=alt.Y(
+                "Cost:Q",
+                axis=alt.Axis(format="%", title="Percentage"),
+                stack="normalize",
+            ),
+            color="Category",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
 
@@ -98,14 +113,27 @@ def check_who(df):
     chart = (
         alt.Chart(who_sum_df)
         .mark_area(opacity=0.5)
-        .encode(x="Date:T", y=alt.Y("Cost:Q",axis=alt.Axis(title="Spend")), color="User")
+        .encode(
+            x="Date:T",
+            y=alt.Y("Cost:Q", axis=alt.Axis(title="Spend")),
+            color="User",
+            tooltip="Cost:Q",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
 
     chart = (
         alt.Chart(who_sum_df)
         .mark_area(opacity=0.5)
-        .encode(x="Date:T", y=alt.Y("Cost:Q", stack="normalize",axis=alt.Axis(format="%", title="Percentage")), color="User")
+        .encode(
+            x="Date:T",
+            y=alt.Y(
+                "Cost:Q",
+                stack="normalize",
+                axis=alt.Axis(format="%", title="Percentage"),
+            ),
+            color="User",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
     st.text("Distribution of number of transactions by category")
@@ -117,9 +145,16 @@ def check_who(df):
     chart = (
         alt.Chart(who_count_df)
         .mark_area(opacity=0.5)
-        .encode(x=alt.X("Date:T",), y=alt.Y("Cost:Q",axis=alt.Axis(title="Number")), color="User")
+        .encode(
+            x=alt.X(
+                "Date:T",
+            ),
+            y=alt.Y("Cost:Q", axis=alt.Axis(title="Number")),
+            color="User",
+        )
     )
     st.altair_chart(chart, use_container_width=True)
+
 
 if __name__ == "__main__":
     df = clean_df()
