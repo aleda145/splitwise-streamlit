@@ -24,7 +24,9 @@ def check_categories(df):
         # just pandas stuff
         cat_df["Category"] = cat_df["Category"].cat.remove_unused_categories()
 
-    show_top = st.slider("Coalesce", 0, len(cat_list), value=5)
+    show_top = st.slider(
+        "Slide to show the top number of categories", 0, len(cat_list), value=5
+    )
 
     if show_top:
         top_5 = (
@@ -73,7 +75,7 @@ def check_categories(df):
 
 def check_who(df):
     cat_list = sorted(list(df["Category"].unique()))
-    compare_cat = st.selectbox("Which Category to check?", cat_list)
+    compare_cat = st.selectbox("Choose Category to check distribution", cat_list)
     who_df = df[df["Category"].isin([compare_cat])]
     who_df["Category"] = who_df["Category"].cat.remove_unused_categories()
     who_df = who_df.melt(
@@ -88,7 +90,7 @@ def check_who(df):
         [pd.Grouper(key="Date", freq="M"), "Category", "User"]
     ).sum()
     who_sum_df = who_sum_df.reset_index()
-
+    st.text("Distribution of spend by category")
     chart = (
         alt.Chart(who_sum_df)
         .mark_area(opacity=0.5)
@@ -102,6 +104,7 @@ def check_who(df):
         .encode(x="Date:T", y=alt.Y("Cost:Q", stack="normalize"), color="User")
     )
     st.altair_chart(chart, use_container_width=True)
+    st.text("Distribution of number of transactions by category")
 
     who_count_df = who_df.groupby(
         [pd.Grouper(key="Date", freq="M"), "Category", "User"]
