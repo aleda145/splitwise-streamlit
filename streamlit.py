@@ -10,6 +10,8 @@ def clean_df():
     # Set types
     df["Cost"] = df["Cost"].astype(float)
     df["Date"] = pd.to_datetime(df["Date"])
+    df["Category"] = df["Category"].astype("category")
+
     return df
 
 
@@ -35,6 +37,8 @@ def check_categories(df):
             .sort_values(by="Cost", ascending=False)[0:show_top]
         )
         top_5_cat = list(top_5.index)
+        new_cat = top_5_cat + ["Other"]
+        cat_df["Category"] = cat_df["Category"].cat.set_categories(new_cat)
         cat_df.loc[~cat_df["Category"].isin(top_5_cat), "Category"] = "Other"
 
     chart = (
@@ -131,6 +135,5 @@ if __name__ == "__main__":
     if st.checkbox("Exlude payments", value=True):
         df = df[df["Category"] != "Payment"]
     check_categories(df)
-    df["Category"] = df["Category"].astype("category")
 
     check_who(df)
